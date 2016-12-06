@@ -21,6 +21,22 @@ abstract class AbstractYear extends \DateTime implements YearInterface
 {
     private $defaultFormat = 'Y';
 
+    static $defaultTimeZone = 'Europe/Prague';
+
+    /**
+     * AbstractYear constructor, that accept year as input parameter for default
+     * @param string $year
+     * @param \DateTimeZone $timezone
+     */
+    public function __construct($year, \DateTimeZone $timezone = null)
+    {
+        $year = intval($year);
+        if (!$timezone) {
+            $timezone = new \DateTimeZone(self::$defaultTimeZone);
+        }
+        parent::__construct($year . '-01-01 00:00:01', $timezone);
+    }
+
     /**
      * Abstract declaration before visibility
      *
@@ -45,7 +61,7 @@ abstract class AbstractYear extends \DateTime implements YearInterface
     public function isLeapYear()
     {
         $year = (int)$this->getFormattedYear();
-        return ((($year % 4) == 0) && ((($year % 100) != 0) || (($year %400) == 0)));
+        return (($year % 4) === 0) && (($year % 100) !== 0 || ($year %400) === 0);
     }
 
     /**
