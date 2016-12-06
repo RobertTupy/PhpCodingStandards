@@ -19,3 +19,9 @@ Verify PHP CodeSniffer with:
 ```phpcs --version```
 
 ```phpcs --standard=PSR2 ./example```
+
+## unit tests example
+
+Example folder also contains test to Company\LeapYear class, with detailed explanations how to organize unit tests.
+
+How to enable PHPUnit from `phpunit.phar` in [PHPStorm](https://www.jetbrains.com/help/phpstorm/2016.2/enabling-phpunit-support.html)
