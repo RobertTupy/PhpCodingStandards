@@ -14,6 +14,9 @@ class LeapYearTest extends \PHPUnit_Framework_TestCase
      * Try to avoid factory methods in test,
      * complex factories can duplicate logic,
      * that should be concern of other unit (package)
+     *
+     * @param string $year
+     * @return LeapYear
      */
     public function createYear($year)
     {
@@ -34,7 +37,7 @@ class LeapYearTest extends \PHPUnit_Framework_TestCase
     {
         $leapYear = $this->createYear('2016');
         $this->assertInstanceOf(YearInterface::class, $leapYear);
-        $this->assertEquals('2016', $leapYear->getFormattedYear());
+        $this->assertEquals('2016-01-01', $leapYear->getFormattedYear());
     }
 
     /**
@@ -101,7 +104,8 @@ class LeapYearTest extends \PHPUnit_Framework_TestCase
      * @param $expect
      * @dataProvider validatorProvider
      */
-    public function testLeapYearIsValid($year, $expect) {
+    public function testLeapYearIsValid($year, $expect)
+    {
         /* it is better to use constructor instead of
          * $leapYear = $this->createYear($year);
          * factory method is far away at this point
@@ -129,4 +133,72 @@ class LeapYearTest extends \PHPUnit_Framework_TestCase
             'invalid if dividable by 100' => array('100', false),
         );
     }
+
+    /**
+     * Comparing
+     *
+     * @param $year
+     * @dataProvider toStringProvider
+     */
+    public function testSameResultForToStringAndForGetFormattedYearWithDefaultFormat($year, $format)
+    {
+        $leapYear = new LeapYear($year);
+        $leapYear->setDefaultFormat($format);
+        $this->assertEquals((string) $leapYear, $leapYear->getFormattedYear());
+    }
+
+    /**
+     * DataProvider for testLeapYearIsValid,
+     *  - pick those values/combinations, that makes sense - be clever
+     *  - don't generate values!!!
+     *  - keep dataProvider close to test method
+     *
+     * @see self::testLeapYearIsValid
+     *
+     * @return array [year, format]
+     */
+    public function toStringProvider()
+    {
+        return array(
+            array('1904', 'Y'),
+            array('2000', 'Y-m-d'),
+            array('1901', 'Y/m/d'),
+            array('100', 'YY'),
+        );
+    }
+
+    /**
+     * Testing protected/private methods
+     */
+    public function testValidLeapYearWithIncorrectDefaultFormat()
+    {
+        $leapYear = new LeapYear('2016');
+        // starting state
+        $this->assertEquals('Y-m-d', $this->invokeMethod($leapYear, 'getDefaultFormat'));
+        $this->assertTrue($leapYear->isValid());
+        // change action
+        $leapYear->setDefaultFormat("d");
+        // expectation
+        $this->assertEquals('d', $this->invokeMethod($leapYear, 'getDefaultFormat'));
+        $this->assertTrue($leapYear->isValid());
+    }
+
+    /**
+     * Call protected/private method of a class.
+     *
+     * @param object &$object    Instantiated object that we will run method on.
+     * @param string $methodName Method name to call
+     * @param array  $parameters Array of parameters to pass into method.
+     *
+     * @return mixed Method return.
+     */
+    public function invokeMethod(&$object, $methodName, array $parameters = array())
+    {
+        $reflection = new \ReflectionClass(get_class($object));
+        $method = $reflection->getMethod($methodName);
+        $method->setAccessible(true);
+
+        return $method->invokeArgs($object, $parameters);
+    }
+
 }

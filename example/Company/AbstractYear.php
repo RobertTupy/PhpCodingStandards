@@ -19,7 +19,7 @@ namespace Company;
  */
 abstract class AbstractYear extends \DateTime implements YearInterface
 {
-    private $defaultFormat = 'Y';
+    protected $defaultFormat = 'Y';
 
     static $defaultTimeZone = 'Europe/Prague';
 
@@ -45,7 +45,7 @@ abstract class AbstractYear extends \DateTime implements YearInterface
      */
     abstract public function setDefaultFormat($format);
 
-    private function getDefaultFormat()
+    protected function getDefaultFormat()
     {
         return $this->defaultFormat;
     }
@@ -60,7 +60,7 @@ abstract class AbstractYear extends \DateTime implements YearInterface
 
     public function isLeapYear()
     {
-        $year = (int)$this->getFormattedYear();
+        $year = (int)$this->format('Y');
         return (($year % 4) === 0) && (($year % 100) !== 0 || ($year %400) === 0);
     }
 
